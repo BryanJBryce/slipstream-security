@@ -502,7 +502,7 @@ def perform_switch(
     slot: str,
     expected_release: str | None,
     *,
-    run: Callable[[list[str]], None] = command_runner,
+    reload_config: Callable[[], None] = validate_and_reload,
     opener: Callable[..., Any] = DIRECT_OPENER,
     load_config: Callable[[], dict[str, Any]] = runtime_config,
 ) -> str:
@@ -522,13 +522,13 @@ def perform_switch(
     atomic_write(upstream_file, after)
 
     try:
-        validate_and_reload(run)
+        reload_config()
         verify_runtime(app_name, app, target_upstream, load_config=load_config)
         verify_endpoint(app_name, app, slot, port, expected_release, public=True, opener=opener)
     except BaseException:
         atomic_write(upstream_file, before)
         try:
-            validate_and_reload(run)
+            reload_config()
             verify_runtime(app_name, app, previous_upstream, load_config=load_config)
         except BaseException as recovery_error:
             raise ContractError(
@@ -557,7 +557,7 @@ def perform_migration(
     slot: str,
     expected_release: str | None,
     *,
-    run: Callable[[list[str]], None] = command_runner,
+    reload_config: Callable[[], None] = validate_and_reload,
     opener: Callable[..., Any] = DIRECT_OPENER,
     load_config: Callable[[], dict[str, Any]] = runtime_config,
 ) -> str:
@@ -579,7 +579,7 @@ def perform_migration(
 
     try:
         verify_site_boundary(app_name, app)
-        validate_and_reload(run)
+        reload_config()
         verify_runtime(app_name, app, target_upstream, load_config=load_config)
         verify_endpoint(app_name, app, slot, port, expected_release, public=True, opener=opener)
     except BaseException:
@@ -589,7 +589,7 @@ def perform_migration(
         else:
             upstream_file.unlink(missing_ok=True)
         try:
-            validate_and_reload(run)
+            reload_config()
         except BaseException as recovery_error:
             raise ContractError(
                 f"{app_name} migration failed and recovery reload failed: {recovery_error}"
@@ -617,7 +617,7 @@ def perform_restore(
     app: dict[str, Any],
     transaction_id: str,
     *,
-    run: Callable[[list[str]], None] = command_runner,
+    reload_config: Callable[[], None] = validate_and_reload,
     load_config: Callable[[], dict[str, Any]] = runtime_config,
 ) -> str:
     path = receipt_path(app_name, transaction_id)
@@ -642,11 +642,11 @@ def perform_restore(
     previous_upstream = receipt["previous_upstream"]
     atomic_write(upstream_file, before)
     try:
-        validate_and_reload(run)
+        reload_config()
         verify_runtime(app_name, app, previous_upstream, load_config=load_config)
     except BaseException:
         atomic_write(upstream_file, current)
-        validate_and_reload(run)
+        reload_config()
         raise
 
     return write_receipt(
@@ -724,7 +724,7 @@ def main(argv: list[str] | None = None) -> int:
                         app,
                         args.slot,
                         args.expected_release,
-                        run=bootstrap_validate_and_reload,
+                        reload_config=bootstrap_validate_and_reload,
                         load_config=bootstrap_runtime_config,
                     )
                 print(transaction)
