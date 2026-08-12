@@ -23,7 +23,7 @@ import uuid
 REGISTRY_PATH = Path("/etc/slipstream-caddy/apps.json")
 LOCK_PATH = Path("/run/lock/slipstream-caddy.lock")
 STATE_ROOT = Path("/var/lib/slipstream-caddy")
-ADMIN_SOCKET = Path("/run/caddy-admin.sock")
+ADMIN_SOCKET = Path("/run/caddy/admin.sock")
 UPSTREAM_PATTERN = re.compile(
     r"^\s*reverse_proxy\s+(?:https?://)?(?:127\.0\.0\.1|localhost):(\d+)\b"
 )

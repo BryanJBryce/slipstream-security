@@ -10,7 +10,8 @@ cannot replace the root Caddyfile or another application's route.
   site file, one exact upstream include, and an allowlist of slot ports.
 - Every mutation takes `/run/lock/slipstream-caddy.lock` before reading or
   writing Caddy state.
-- Caddy's admin API listens on the root-only `/run/caddy-admin.sock`; the
+- Caddy's admin API listens on `/run/caddy/admin.sock` inside a systemd-managed
+  runtime directory inaccessible to deploy users; the
   loopback TCP admin endpoint is disabled so application processes cannot load
   runtime configuration behind the file-backed source of truth.
 - The helper writes only `/etc/caddy/upstreams/<app>.caddy`, validates the full
@@ -52,9 +53,13 @@ root-owned and not writable by deploy users:
 The root Caddyfile global options must include:
 
 ```caddy
-admin unix//run/caddy-admin.sock
+admin unix//run/caddy/admin.sock
 persist_config off
 ```
+
+Install `systemd/caddy-admin-socket.conf` as the Caddy service override before
+enabling the socket. Systemd then creates `/run/caddy` for the `caddy` service
+user on every start instead of relying on a mutable, manually owned directory.
 
 Run `migrate APP SLOT` once per registered app, supplying an expected release
 for apps that expose release identity. Migration preserves the current site,
