@@ -27,7 +27,8 @@ blue/green production workflows target separate hosts. Static sites and fixed
 reverse proxies likewise have no switching caller and remain root-owned Caddy
 policy outside this contract.
 
-The one-time `migrate` command is intentionally absent from deploy-user
-sudoers after host reconciliation. It is a root-only installation operation;
-ongoing callers receive only `inspect`, `switch`, and transaction-bound
-`restore` access.
+The one-time `migrate` command is intentionally absent from the canonical
+deploy-user sudoers. It is a root-only installation operation; ongoing source
+grants only `inspect`, `switch`, and transaction-bound `restore` access. The
+live host's preexisting `migrate` grant remains registry-bound and globally
+locked until an interactive host operator installs the final sudoers fragment.
