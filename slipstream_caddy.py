@@ -28,6 +28,7 @@ UPSTREAM_PATTERN = re.compile(
     r"^\s*reverse_proxy\s+(?:https?://)?(?:127\.0\.0\.1|localhost):(\d+)\b"
 )
 SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
+DIRECT_OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({})).open
 
 
 class ContractError(RuntimeError):
@@ -206,7 +207,7 @@ def response_headers(
     url: str,
     *,
     headers: dict[str, str] | None = None,
-    opener: Callable[..., Any] = urllib.request.urlopen,
+    opener: Callable[..., Any] = DIRECT_OPENER,
 ) -> tuple[int, dict[str, str]]:
     request = urllib.request.Request(url, headers=headers or {}, method="GET")
     try:
@@ -253,7 +254,7 @@ def verify_endpoint(
     expected_release: str | None,
     *,
     public: bool,
-    opener: Callable[..., Any] = urllib.request.urlopen,
+    opener: Callable[..., Any] = DIRECT_OPENER,
 ) -> None:
     health = app.get("health", {})
     if public and not health.get("public_verify", True):
@@ -274,7 +275,11 @@ def verify_endpoint(
         if not isinstance(path, str) or not path.startswith("/"):
             fail(f"local health path is invalid for {app_name}")
         url = f"http://127.0.0.1:{port}{path}"
-        headers = {"Host": app["canonical_host"]}
+        headers = {
+            "Host": app["canonical_host"],
+            "X-Forwarded-Host": app["canonical_host"],
+            "X-Forwarded-Proto": "https",
+        }
         headers.update(health.get("local_headers", {}))
 
     status, actual_headers = response_headers(url, headers=headers, opener=opener)
@@ -498,7 +503,7 @@ def perform_switch(
     expected_release: str | None,
     *,
     run: Callable[[list[str]], None] = command_runner,
-    opener: Callable[..., Any] = urllib.request.urlopen,
+    opener: Callable[..., Any] = DIRECT_OPENER,
     load_config: Callable[[], dict[str, Any]] = runtime_config,
 ) -> str:
     port, target_upstream = target_for(app_name, app, slot)
@@ -553,7 +558,7 @@ def perform_migration(
     expected_release: str | None,
     *,
     run: Callable[[list[str]], None] = command_runner,
-    opener: Callable[..., Any] = urllib.request.urlopen,
+    opener: Callable[..., Any] = DIRECT_OPENER,
     load_config: Callable[[], dict[str, Any]] = runtime_config,
 ) -> str:
     port, target_upstream = target_for(app_name, app, slot)
