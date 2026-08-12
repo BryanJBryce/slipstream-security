@@ -120,10 +120,10 @@ def upstream_text(app: dict[str, Any], port: int) -> bytes:
     template = app.get("upstream_template", "reverse_proxy 127.0.0.1:{port}\n")
     if not isinstance(template, str):
         fail("upstream template must be a string")
-    if set(re.findall(r"{([^{}]+)}", template)) - {"port"}:
-        fail("upstream template contains unsupported placeholders")
+    if template.count("{port}") != 1:
+        fail("upstream template must contain exactly one {port} placeholder")
 
-    rendered = template.format(port=port)
+    rendered = template.replace("{port}", str(port))
     matches = [
         int(match.group(1))
         for line in rendered.splitlines()
