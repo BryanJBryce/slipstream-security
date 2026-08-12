@@ -68,7 +68,7 @@
       }
     },
     "key-to-the-town-web": {
-      "canonical_host": "key-to-the-town.brycelabs.com",
+      "canonical_host": "keys.brycelabs.com",
       "site_file": "/etc/caddy/Caddyfile",
       "upstream_file": "/etc/caddy/upstreams/key-to-the-town-web.caddy",
       "slots": {"blue": 4500, "green": 4501},
@@ -79,7 +79,7 @@
       },
       "health": {
         "path": "/healthz",
-        "public_url": "https://key-to-the-town.brycelabs.com/healthz",
+        "public_url": "https://keys.brycelabs.com/healthz",
         "statuses": [200],
         "local_headers": {"X-Forwarded-Proto": "https"}
       }
