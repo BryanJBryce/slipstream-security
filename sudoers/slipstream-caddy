@@ -1,0 +1,5 @@
+Defaults:bryan !requiretty
+bryan ALL=(root) NOPASSWD: /usr/local/sbin/slipstream-caddy inspect *
+bryan ALL=(root) NOPASSWD: /usr/local/sbin/slipstream-caddy switch *
+bryan ALL=(root) NOPASSWD: /usr/local/sbin/slipstream-caddy restore *
+bryan ALL=(root) NOPASSWD: /usr/local/sbin/slipstream-caddy migrate *

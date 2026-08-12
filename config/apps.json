@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "apps": {
+    "ash-creek": {
+      "canonical_host": "ashcreek.brycelabs.com",
+      "site_file": "/etc/caddy/sites/ash-creek-active.caddy",
+      "upstream_file": "/etc/caddy/upstreams/ash-creek.caddy",
+      "slots": {"blue": 5331, "green": 5332},
+      "upstream_template": "reverse_proxy 127.0.0.1:{port}\n",
+      "health": {
+        "path": "/healthz",
+        "public_url": "https://ashcreek.brycelabs.com/healthz",
+        "statuses": [200]
+      }
+    },
+    "bestbale": {
+      "canonical_host": "store.bestbaleusa.com",
+      "site_file": "/etc/caddy/sites/bestbale.caddy",
+      "upstream_file": "/etc/caddy/upstreams/bestbale.caddy",
+      "legacy_imports": ["import /etc/bestbale/caddy/upstream.caddy"],
+      "slots": {"blue": 4102, "green": 4103},
+      "upstream_template": "reverse_proxy 127.0.0.1:{port}\n",
+      "identity": {"release_header": "x-bestbale-release"},
+      "health": {
+        "path": "/",
+        "public_url": "https://store.bestbaleusa.com/",
+        "statuses": [200]
+      }
+    },
+    "bryce-labs-web": {
+      "canonical_host": "brycelabs.com",
+      "site_file": "/etc/caddy/sites/bryce-labs-web.caddy",
+      "upstream_file": "/etc/caddy/upstreams/bryce-labs-web.caddy",
+      "slots": {"blue": 4220, "green": 4221},
+      "upstream_template": "reverse_proxy 127.0.0.1:{port} {\n  health_uri /healthz\n  health_interval 5s\n  health_timeout 2s\n}\n",
+      "health": {
+        "path": "/healthz",
+        "public_url": "https://brycelabs.com/healthz",
+        "statuses": [200]
+      }
+    },
+    "dannys": {
+      "canonical_host": "dannys.brycelabs.com",
+      "site_file": "/etc/caddy/sites/dannys.caddy",
+      "upstream_file": "/etc/caddy/upstreams/dannys.caddy",
+      "slots": {"blue": 4120, "green": 4121},
+      "upstream_template": "reverse_proxy 127.0.0.1:{port} {\n  health_uri /healthz\n  health_interval 10s\n  health_timeout 2s\n}\n",
+      "health": {
+        "path": "/healthz",
+        "public_url": "https://dannys.brycelabs.com/healthz",
+        "statuses": [200]
+      }
+    },
+    "imm-web": {
+      "canonical_host": "independentmining.com",
+      "site_file": "/etc/caddy/sites/imm-web.caddy",
+      "upstream_file": "/etc/caddy/upstreams/imm-web.caddy",
+      "slots": {"blue": 4131, "green": 4132},
+      "upstream_template": "reverse_proxy 127.0.0.1:{port}\n",
+      "identity": {
+        "slot_header": "x-imm-slot",
+        "release_header": "x-imm-release"
+      },
+      "health": {
+        "path": "/healthz",
+        "public_url": "https://independentmining.com/healthz",
+        "statuses": [200]
+      }
+    },
+    "key-to-the-town-web": {
+      "canonical_host": "key-to-the-town.brycelabs.com",
+      "site_file": "/etc/caddy/Caddyfile",
+      "upstream_file": "/etc/caddy/upstreams/key-to-the-town-web.caddy",
+      "slots": {"blue": 4500, "green": 4501},
+      "upstream_template": "reverse_proxy 127.0.0.1:{port}\n",
+      "identity": {
+        "slot_header": "x-app-slot",
+        "release_header": "x-release-sha"
+      },
+      "health": {
+        "path": "/healthz",
+        "public_url": "https://key-to-the-town.brycelabs.com/healthz",
+        "statuses": [200],
+        "local_headers": {"X-Forwarded-Proto": "https"}
+      }
+    },
+    "kinship": {
+      "canonical_host": "kinship.brycelabs.com",
+      "site_file": "/etc/caddy/sites/kinship.caddy",
+      "upstream_file": "/etc/caddy/upstreams/kinship.caddy",
+      "slots": {"blue": 4140, "green": 4141},
+      "upstream_template": "reverse_proxy 127.0.0.1:{port}\n",
+      "identity": {
+        "slot_header": "x-kinship-slot",
+        "release_header": "x-kinship-release"
+      },
+      "health": {
+        "path": "/healthz",
+        "public_url": "https://kinship.brycelabs.com/healthz",
+        "statuses": [200]
+      }
+    },
+    "leads": {
+      "canonical_host": "leads.brycelabs.com",
+      "site_file": "/etc/caddy/sites/leads.brycelabs.com.caddy",
+      "upstream_file": "/etc/caddy/upstreams/leads.caddy",
+      "slots": {"red": 4560, "green": 4561},
+      "upstream_template": "reverse_proxy 127.0.0.1:{port} {\n  health_uri /healthz\n  health_interval 5s\n  health_timeout 2s\n}\n",
+      "health": {
+        "path": "/healthz",
+        "public_url": "https://leads.brycelabs.com/healthz",
+        "statuses": [200],
+        "public_verify": false
+      }
+    },
+    "mentat": {
+      "canonical_host": "mentat.app",
+      "site_file": "/etc/caddy/sites/mentat.brycelabs.com.caddy",
+      "upstream_file": "/etc/caddy/upstreams/mentat.caddy",
+      "slots": {"blue": 4555, "green": 4556},
+      "upstream_template": "reverse_proxy 127.0.0.1:{port}\n",
+      "health": {
+        "path": "/health",
+        "public_url": "https://mentat.app/health",
+        "statuses": [200]
+      }
+    },
+    "pima": {
+      "canonical_host": "pima.brycelabs.com",
+      "site_file": "/etc/caddy/sites/pima.brycelabs.com.caddy",
+      "upstream_file": "/etc/caddy/upstreams/pima.caddy",
+      "slots": {"blue": 4122, "green": 4123},
+      "upstream_template": "reverse_proxy 127.0.0.1:{port} {\n  health_uri /healthz\n  health_interval 10s\n  health_timeout 2s\n}\n",
+      "health": {
+        "path": "/healthz",
+        "public_url": "https://pima.brycelabs.com/healthz",
+        "statuses": [200]
+      }
+    }
+  }
+}
