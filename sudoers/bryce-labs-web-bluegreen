@@ -1,0 +1,3 @@
+Defaults:bryan !requiretty
+bryan ALL=(root) NOPASSWD: /usr/bin/systemctl
+bryan ALL=(root) NOPASSWD: /bin/systemctl

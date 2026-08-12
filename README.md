@@ -36,6 +36,11 @@ sudo -n /usr/local/sbin/slipstream-caddy restore APP TRANSACTION_ID
 `--expected-release` is mandatory for registry entries with a release identity
 header and omitted for apps that do not expose one.
 
+The `adapters/` directory contains the versioned callers for host-managed apps
+that do not have their own deployment repository. Install those files at the
+existing app-specific switch paths; they retain each app's marker convention
+while delegating every Caddy read and write to this contract.
+
 ## Host installation
 
 Install the Python helper as root-owned mode `755`, the registry as root-owned
@@ -61,6 +66,12 @@ Install `systemd/caddy-admin-socket.conf` as the Caddy service override before
 enabling the socket. Systemd then creates `/run/caddy` for the `caddy` service
 user on every start instead of relying on a mutable, manually owned directory.
 
+Replace the legacy `bryan-caddy-deploy`, `bryce-labs-web-bluegreen`, and
+`mentat-deploy` sudoers fragments with the same-named files in `sudoers/`.
+Those replacements remove direct Caddy, root-copy, and root-mkdir permissions;
+application deployers retain only their service controls plus the shared
+contract commands in `sudoers/slipstream-caddy`.
+
 Run `migrate APP SLOT` once per registered app, supplying an expected release
 for apps that expose release identity. Migration preserves the current site,
 replaces only its managed reverse proxy with the app-specific import, validates
@@ -70,10 +81,16 @@ legacy loopback endpoint; `inspect`, `switch`, and `restore` fail closed. After
 the socket is created, migration also uses the socket and the TCP fallback is
 permanently disabled.
 
+Run migration directly as root during installation. It is deliberately not a
+deploy-user sudo command after the boundary is established. See
+`docs/slipstream-switching-inventory.md` for the complete caller inventory and
+the explicit non-switching exclusions.
+
 ## Validation
 
 ```sh
 python3 -m unittest discover -s tests -v
 python3 -m py_compile slipstream_caddy.py
 python3 -m json.tool config/apps.json >/dev/null
+bash -n adapters/*.sh
 ```
