@@ -198,7 +198,7 @@ def bootstrap_validate_and_reload(
             "--config",
             "/etc/caddy/Caddyfile",
             "--address",
-            "http://127.0.0.1:2019",
+            "127.0.0.1:2019",
         ]
     )
 
