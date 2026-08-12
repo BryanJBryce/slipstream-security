@@ -60,7 +60,10 @@ Run `migrate APP SLOT` once per registered app, supplying an expected release
 for apps that expose release identity. Migration preserves the current site,
 replaces only its managed reverse proxy with the app-specific import, validates
 and reloads the complete Caddyfile, verifies the public target, and restores the
-site on failure.
+site on failure. Before the admin socket exists, only `migrate` may use the
+legacy loopback endpoint; `inspect`, `switch`, and `restore` fail closed. After
+the socket is created, migration also uses the socket and the TCP fallback is
+permanently disabled.
 
 ## Validation
 

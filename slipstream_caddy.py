@@ -183,6 +183,25 @@ def validate_and_reload(run: Callable[[list[str]], None] = command_runner) -> No
     )
 
 
+def bootstrap_validate_and_reload(
+    run: Callable[[list[str]], None] = command_runner,
+) -> None:
+    """Reload through the legacy loopback endpoint during one-time migration."""
+    if ADMIN_SOCKET.exists():
+        fail("bootstrap reload is disabled after the admin socket exists")
+    run(["/usr/bin/caddy", "validate", "--config", "/etc/caddy/Caddyfile"])
+    run(
+        [
+            "/usr/bin/caddy",
+            "reload",
+            "--config",
+            "/etc/caddy/Caddyfile",
+            "--address",
+            "http://127.0.0.1:2019",
+        ]
+    )
+
+
 def response_headers(
     url: str,
     *,
@@ -288,6 +307,16 @@ def runtime_config() -> dict[str, Any]:
         return json.loads(result.stdout)
     except (OSError, ValueError, subprocess.CalledProcessError) as exc:
         fail(f"could not inspect Caddy runtime configuration: {exc}")
+
+
+def bootstrap_runtime_config() -> dict[str, Any]:
+    if ADMIN_SOCKET.exists():
+        fail("bootstrap admin access is disabled after the admin socket exists")
+    try:
+        with urllib.request.urlopen("http://127.0.0.1:2019/config/", timeout=10) as response:
+            return json.load(response)
+    except (OSError, ValueError) as exc:
+        fail(f"could not inspect the bootstrap Caddy runtime configuration: {exc}")
 
 
 def runtime_upstreams(
@@ -680,7 +709,20 @@ def main(argv: list[str] | None = None) -> int:
                 print(perform_switch(args.app, app, args.slot, args.expected_release))
                 return 0
             if args.command == "migrate":
-                print(perform_migration(args.app, app, args.slot, args.expected_release))
+                if ADMIN_SOCKET.exists():
+                    transaction = perform_migration(
+                        args.app, app, args.slot, args.expected_release
+                    )
+                else:
+                    transaction = perform_migration(
+                        args.app,
+                        app,
+                        args.slot,
+                        args.expected_release,
+                        run=bootstrap_validate_and_reload,
+                        load_config=bootstrap_runtime_config,
+                    )
+                print(transaction)
                 return 0
             if args.command == "restore":
                 print(perform_restore(args.app, app, args.transaction_id))
