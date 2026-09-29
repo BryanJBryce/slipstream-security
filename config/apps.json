@@ -85,7 +85,7 @@
       }
     },
     "kinship": {
-      "canonical_host": "kinship.brycelabs.com",
+      "canonical_host": "kinshipcareapp.com",
       "site_file": "/etc/caddy/sites/kinship.caddy",
       "upstream_file": "/etc/caddy/upstreams/kinship.caddy",
       "slots": {"blue": 4140, "green": 4141},
@@ -96,7 +96,7 @@
       },
       "health": {
         "path": "/healthz",
-        "public_url": "https://kinship.brycelabs.com/healthz",
+        "public_url": "https://kinshipcareapp.com/healthz",
         "statuses": [200]
       }
     },
